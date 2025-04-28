@@ -10,7 +10,7 @@ namespace RegelungstechnikUniA
         m_lastTime = currentTime;
 
         double gyroAngleZ = m_angle + t_gyroZ * dt;
-        double accelAngleZ = std::atan(t_accelX / t_accelY) * 180 / M_PI;
+        double accelAngleZ = std::atan(t_accelY /t_accelX) * 180 / M_PI;
         m_angle = m_alpha * gyroAngleZ + (1 - m_alpha) * accelAngleZ;
     }
 }
