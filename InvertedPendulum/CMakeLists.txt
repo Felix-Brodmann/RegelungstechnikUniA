@@ -11,9 +11,9 @@ set(SOURCE_FILES
 
 add_executable(InvertedPendulum ${SOURCE_FILES})
 
-target_include_directories(my_executable PRIVATE /usr/include)
-target_include_directories(my_executable PRIVATE /usr/local/include)
-target_include_directories(my_executable PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(InvertedPendulum PRIVATE /usr/include)
+target_include_directories(InvertedPendulum PRIVATE /usr/local/include)
+target_include_directories(InvertedPendulum PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries(InvertedPendulum
     pthread
