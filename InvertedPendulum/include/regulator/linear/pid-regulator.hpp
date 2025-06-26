@@ -424,7 +424,7 @@ public:
             {
                 return false;
             }
-        }, t_outputMin, t_max))
+        }, t_outputMin, t_outputMax))
         {
             throw std::invalid_argument("Minimum cannot be greater than maximum and must be of a supported type");
         }
