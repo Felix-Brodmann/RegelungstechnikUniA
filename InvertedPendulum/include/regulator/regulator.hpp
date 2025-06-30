@@ -29,7 +29,7 @@ private:
     std::string m_regulatorName;
     std::unique_ptr<Sensor> m_sensor;
     std::unique_ptr<Actuator> m_actuator;
-    std::unique_ptr<OutputStream> m_outputStream; // Optional output stream for logging or debugging
+    std::shared_ptr<OutputStream> m_outputStream; // Optional output stream for logging or debugging
     int m_samplingRate = 100;
     std::atomic_bool m_isRegulating = false;
 
@@ -64,7 +64,7 @@ public:
         m_regulatorName = t_regulatorName;
         m_sensor = std::move(t_sensor);
         m_actuator = std::move(t_actuator);
-        setOutputStream(std::make_unique<VoidOutputStream>()); // Default output stream
+        setOutputStream(std::make_shared<VoidOutputStream>()); // Default output stream
     }
 
     ~Regulator() = default;
@@ -116,15 +116,15 @@ public:
 
     /**
      * @brief Set the output stream for the regulator.
-     * @param t_outputStream A unique pointer to the output stream to be used for logging or debugging.
+     * @param t_outputStream A shared pointer to the output stream to be used for logging or debugging.
      */
-    void setOutputStream(std::unique_ptr<OutputStream> t_outputStream)
+    void setOutputStream(std::shared_ptr<OutputStream> t_outputStream)
     {
         if (t_outputStream == nullptr)
         {
             throw std::invalid_argument("Output stream cannot be null");
         }
-        m_outputStream = std::move(t_outputStream);
+        m_outputStream = t_outputStream;
     }
 
     /**

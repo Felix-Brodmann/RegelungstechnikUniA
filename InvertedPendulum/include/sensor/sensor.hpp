@@ -27,7 +27,7 @@ private:
     SensorData m_latestSensorData; // Latest sensor data
     SensorDataWithTimestamp m_latestSensorDataWithTimestamp; // Latest sensor data with timestamp
     std::unique_ptr<Filter> m_filter = nullptr; // Optional filter for processing sensor data
-    std::unique_ptr<OutputStream> m_outputStream; // Optional output stream for logging or debugging
+    std::shared_ptr<OutputStream> m_outputStream; // Optional output stream for logging or debugging
 
     /**
      * @brief Check if there is any filter set for the sensor.
@@ -73,7 +73,7 @@ public:
     Sensor(const std::string &t_sensorName)
     {
         m_sensorName = t_sensorName;
-        setOutputStream(std::make_unique<VoidOutputStream>()); // Default output stream
+        setOutputStream(std::make_shared<VoidOutputStream>()); // Default output stream
     }
 
     virtual ~Sensor() = default;
@@ -138,15 +138,15 @@ public:
 
     /**
      * @brief Set the output stream for the sensor.
-     * @param t_outputStream A unique pointer to the output stream to be set.
+     * @param t_outputStream A shared pointer to the output stream to be set.
      */
-    void setOutputStream(std::unique_ptr<OutputStream> t_outputStream)
+    void setOutputStream(std::shared_ptr<OutputStream> t_outputStream)
     {
         if (t_outputStream == nullptr)
         {
             throw std::invalid_argument("Output stream cannot be null");
         }
-        m_outputStream = std::move(t_outputStream);
+        m_outputStream = t_outputStream;
     }
 
     /**
