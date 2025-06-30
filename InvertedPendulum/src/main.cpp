@@ -22,6 +22,9 @@ int main()
 {
     try
     {
+        // Output stream for logging
+        std::unique_ptr<control_engineering_uni_a::OutputStream> outputStream = std::make_unique<control_engineering_uni_a::ConsoleOutputStream>();
+
         /**********************
          ******* Sensor *******
          **********************/
@@ -50,8 +53,8 @@ int main()
         std::unique_ptr<control_engineering_uni_a::ComplementaryFilter> imuFilter =
             std::make_unique<control_engineering_uni_a::ComplementaryFilter>(0.98);
 
-        // Add the filter to the IMU sensor
-        imuSensor->addFilter(std::move(imuFilter));
+        imuSensor->addFilter(std::move(imuFilter)); // Add the filter to the IMU sensor
+        imuSensor->setOutputStream(std::move(outputStream)); // Set the output stream for the sensor
 
         std::cout << "Sensor created successfully." << std::endl;
 
@@ -102,9 +105,7 @@ int main()
             .build();
 
         pidRegulator->setSamplingRate(100); // Set the sampling rate to 100 Hz
-
-        std::unique_ptr<control_engineering_uni_a::OutputStream> outputStream = std::make_unique<control_engineering_uni_a::ConsoleOutputStream>();
-        pidRegulator->setOutputStream(std::move(outputStream));
+        pidRegulator->setOutputStream(std::move(outputStream)); // Set the output stream for logging
 
         std::cout << "PID regulator created successfully." << std::endl;
 

@@ -509,6 +509,7 @@ public:
         sensorData.temperature = readThermometer();
         setSensorData(sensorData);
         setSensorDataWithTimestamp({sensorData, std::chrono::system_clock::now()});
+        
     }
 };
 

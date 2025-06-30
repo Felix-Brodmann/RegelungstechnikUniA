@@ -6,6 +6,8 @@
 
 #include "utility/types.hpp"
 #include "utility/filter.hpp"
+#include "utility/output-stream.hpp"
+#include "utility/output-stream/void-output-stream.hpp"
 
 namespace control_engineering_uni_a
 {
@@ -25,6 +27,7 @@ private:
     SensorData m_latestSensorData; // Latest sensor data
     SensorDataWithTimestamp m_latestSensorDataWithTimestamp; // Latest sensor data with timestamp
     std::unique_ptr<Filter> m_filter = nullptr; // Optional filter for processing sensor data
+    std::unique_ptr<OutputStream> m_outputStream; // Optional output stream for logging or debugging
 
     /**
      * @brief Check if there is any filter set for the sensor.
@@ -70,6 +73,7 @@ public:
     Sensor(const std::string &t_sensorName)
     {
         m_sensorName = t_sensorName;
+        setOutputStream(std::make_unique<VoidOutputStream>()); // Default output stream
     }
 
     virtual ~Sensor() = default;
@@ -117,6 +121,32 @@ public:
             return m_filter->getFilteredDataWithTimestamp();
         }
         return m_latestSensorDataWithTimestamp;
+    }
+
+    /**
+     * @brief Get the output stream for the sensor.
+     * @return A reference to the output stream.
+     */
+    OutputStream& getOutputStream()
+    {
+        if (m_outputStream == nullptr)
+        {
+            throw std::runtime_error("Output stream is not set");
+        }
+        return *m_outputStream;
+    }
+
+    /**
+     * @brief Set the output stream for the sensor.
+     * @param t_outputStream A unique pointer to the output stream to be set.
+     */
+    void setOutputStream(std::unique_ptr<OutputStream> t_outputStream)
+    {
+        if (t_outputStream == nullptr)
+        {
+            throw std::invalid_argument("Output stream cannot be null");
+        }
+        m_outputStream = std::move(t_outputStream);
     }
 
     /**

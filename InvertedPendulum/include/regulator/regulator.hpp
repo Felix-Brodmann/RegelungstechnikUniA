@@ -11,6 +11,7 @@
 #include "sensor/sensor.hpp"
 #include "actuator/actuator.hpp"
 #include "utility/output-stream.hpp"
+#include "utility/output-stream/void-output-stream.hpp"
 
 namespace control_engineering_uni_a
 {
@@ -63,6 +64,7 @@ public:
         m_regulatorName = t_regulatorName;
         m_sensor = std::move(t_sensor);
         m_actuator = std::move(t_actuator);
+        setOutputStream(std::make_unique<VoidOutputStream>()); // Default output stream
     }
 
     ~Regulator() = default;

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 
 #include "utility/output-stream.hpp"
 
@@ -22,6 +23,11 @@ public:
     ConsoleOutputStream() = default;
     
     /**
+     * @brief Destructor for the ConsoleOutputStream class.
+     */
+    ~ConsoleOutputStream() override = default;
+
+    /**
      * @brief Writes a string to the console.
      * @param t_component The component name or identifier that is writing to the console.
      * @param t_string The string to write to the console.
@@ -33,11 +39,6 @@ public:
         std::cout << t_string;
         std::cout << std::endl;
     }
-
-    /**
-     * @brief Destructor for the ConsoleOutputStream class.
-     */
-    ~ConsoleOutputStream() override = default;
 };
 
 } // namespace control_engineering_uni_a
