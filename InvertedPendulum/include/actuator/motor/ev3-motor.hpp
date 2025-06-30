@@ -363,6 +363,9 @@ public:
 
         // Set the duty cycle
         m_pwmDevice->setDutyCycle(std::abs(t_speed));
+
+        // Log the control value
+        getOutputStream().write(getActuatorName(), "Set control value: " + std::to_string(t_speed) + "%");
     }
 
     /**

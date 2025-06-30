@@ -5,6 +5,8 @@
 #include <chrono>
 
 #include "utility/types.hpp"
+#include "utility/output-stream.hpp"
+#include "utility/output-stream/void-output-stream.hpp"
 
 namespace control_engineering_uni_a
 {
@@ -22,6 +24,7 @@ private:
     std::string m_filterName;
     SensorData m_latestFilteredData;
     SensorDataWithTimestamp m_latestFilteredDataWithTimestamp;
+    std::shared_ptr<OutputStream> m_outputStream; // Optional output stream for logging or debugging
 
 protected:
     /**
@@ -50,6 +53,7 @@ public:
     Filter(const std::string &t_filterName)
     {
         m_filterName = t_filterName;
+        m_outputStream = std::make_shared<VoidOutputStream>(); // Default output stream
     }
 
     virtual ~Filter() = default;
@@ -79,6 +83,32 @@ public:
     SensorDataWithTimestamp getFilteredDataWithTimestamp() const
     {
         return m_latestFilteredDataWithTimestamp;
+    }
+
+    /**
+     * @brief Get the output stream for logging or debugging.
+     * @return A reference to the output stream.
+     */
+    OutputStream& getOutputStream()
+    {
+        if (m_outputStream == nullptr)
+        {
+            throw std::runtime_error("Output stream is not set");
+        }
+        return *m_outputStream;
+    }
+
+    /**
+     * @brief Set the output stream for logging or debugging.
+     * @param t_outputStream A shared pointer to the output stream to be set.
+     */
+    void setOutputStream(std::shared_ptr<OutputStream> t_outputStream)
+    {
+        if (t_outputStream == nullptr)
+        {       
+            throw std::invalid_argument("Output stream cannot be null");
+        }
+        m_outputStream = t_outputStream;
     }
 
     /**

@@ -70,6 +70,7 @@ public:
             double newAngle = m_alpha * gyroAngleZ + (1 - m_alpha) * accelAngleZ;
             setFilteredData(newAngle);
             setFilteredDataWithTimestamp({newAngle, std::chrono::system_clock::now()});
+            getOutputStream().write(getFilterName(), "ComplementaryFilter updated angle: " + std::to_string(newAngle));
         }
         else
         {
