@@ -80,6 +80,8 @@ int main()
             .setTachoBPin(EV3_MOTOR_TACHO_B_PIN)
             .build();
 
+        motor->setOutputStream(outputStream); // Set the output stream for the actuator
+
         std::cout << "Actuator created successfully." << std::endl;
 
         /**********************

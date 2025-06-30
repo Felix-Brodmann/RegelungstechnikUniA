@@ -4,6 +4,8 @@
 #include <string>
 
 #include "utility/types.hpp"
+#include "utility/output-stream.hpp"
+#include "utility/output-stream/void-output-stream.hpp"
 
 namespace control_engineering_uni_a
 {
@@ -20,6 +22,7 @@ class Actuator
 {
 private:
     std::string m_actuatorName;
+    std::shared_ptr<OutputStream> m_outputStream; // Optional output stream for logging or debugging
 
 public:
     /**
@@ -29,6 +32,7 @@ public:
     Actuator(const std::string &t_actuatorName)
     {
         m_actuatorName = t_actuatorName;
+        m_outputStream = std::make_shared<VoidOutputStream>(); // Default output stream
     }
 
     virtual ~Actuator() = default;
@@ -40,6 +44,32 @@ public:
     std::string getActuatorName() const
     {
         return m_actuatorName;
+    }
+
+    /**
+     * @brief Get the output stream for the actuator.
+     * @return A reference to the output stream.
+     */
+    OutputStream& getOutputStream()
+    {
+        if (m_outputStream == nullptr)
+        {
+            throw std::runtime_error("Output stream is not set");
+        }
+        return *m_outputStream;
+    }
+
+    /**
+     * @brief Set the output stream for the actuator.
+     * @param t_outputStream A shared pointer to the output stream to be set.
+     */
+    void setOutputStream(std::shared_ptr<OutputStream> t_outputStream)
+    {
+        if (t_outputStream == nullptr)
+        {
+            throw std::invalid_argument("Output stream cannot be null");
+        }
+        m_outputStream = t_outputStream;
     }
 
     /**

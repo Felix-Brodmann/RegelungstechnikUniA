@@ -267,7 +267,7 @@ private:
     double readThermometer()
     {
         // Set the resolution and offset
-        double scale = 0.0625;
+        double scale = 0.003906;
         double offset = 25.0; // [°C]
 
         // Read the values from the sensor
@@ -509,7 +509,7 @@ public:
         sensorData.temperature = readThermometer();
         setSensorData(sensorData);
         setSensorDataWithTimestamp({sensorData, std::chrono::system_clock::now()});
-        
+        getOutputStream().write(getSensorName(), "IMU read data: " + toString(sensorData));
     }
 };
 
