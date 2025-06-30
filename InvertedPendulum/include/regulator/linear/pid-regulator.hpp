@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <map>
+#include <mutex>
 
 #include "regulator/regulator.hpp"
 #include "utility/types.hpp"
@@ -25,21 +26,21 @@ class PIDRegulator : public Regulator
 {
 private:
     double m_kp = 1.0; // Proportional gain
-    std::mutex m_kpMutex; // Mutex for Kp to ensure thread safety
+    mutable std::mutex m_kpMutex; // Mutex for Kp to ensure thread safety
     double m_ki = 0.0; // Integral gain
-    std::mutex m_kiMutex; // Mutex for Ki to ensure thread safety
+    mutable std::mutex m_kiMutex; // Mutex for Ki to ensure thread safety
     double m_kd = 0.0; // Derivative gain
-    std::mutex m_kdMutex; // Mutex for Kd to ensure thread safety
+    mutable std::mutex m_kdMutex; // Mutex for Kd to ensure thread safety
     SensorData m_setpoint; // Setpoint value
-    std::mutex m_setpointMutex; // Mutex for setpoint to ensure thread safety
+    mutable std::mutex m_setpointMutex; // Mutex for setpoint to ensure thread safety
     SensorData m_outputMin; // Minimum output value
-    std::mutex m_outputMinMutex; // Mutex for outputMin to ensure thread safety
+    mutable std::mutex m_outputMinMutex; // Mutex for outputMin to ensure thread safety
     SensorData m_outputMax; // Maximum output value
-    std::mutex m_outputMaxMutex; // Mutex for outputMax to ensure thread safety
+    mutable std::mutex m_outputMaxMutex; // Mutex for outputMax to ensure thread safety
     SensorData m_integralMin; // Minimum integral value (for anti-windup)
-    std::mutex m_integralMinMutex; // Mutex for integralMin to ensure thread safety
+    mutable std::mutex m_integralMinMutex; // Mutex for integralMin to ensure thread safety
     SensorData m_integralMax; // Maximum integral value (for anti-windup)
-    std::mutex m_integralMaxMutex; // Mutex for integralMax to ensure thread safety
+    mutable std::mutex m_integralMaxMutex; // Mutex for integralMax to ensure thread safety
 
     SensorData m_lastError; // Last error value
     SensorData m_integral; // Integral value

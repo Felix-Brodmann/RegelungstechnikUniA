@@ -17,6 +17,11 @@ class ConsoleOutputStream : public OutputStream
 {
 public:
     /**
+     * @brief Default constructor for the ConsoleOutputStream class.
+     */
+    ConsoleOutputStream() = default;
+    
+    /**
      * @brief Writes a string to the console.
      * @param t_component The component name or identifier that is writing to the console.
      * @param t_string The string to write to the console.

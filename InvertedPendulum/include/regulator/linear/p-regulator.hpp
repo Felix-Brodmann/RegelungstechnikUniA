@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <map>
+#include <mutex>
 
 #include "regulator/regulator.hpp"
 #include "utility/types.hpp"
@@ -25,13 +26,13 @@ class PRegulator : public Regulator
 {
 private:
     double m_kp = 1.0; // Proportional gain
-    std::mutex m_kpMutex; // Mutex for Kp to ensure thread safety
+    mutable std::mutex m_kpMutex; // Mutex for Kp to ensure thread safety
     SensorData m_setpoint; // Setpoint value
-    std::mutex m_setpointMutex; // Mutex for setpoint to ensure thread safety
+    mutable std::mutex m_setpointMutex; // Mutex for setpoint to ensure thread safety
     SensorData m_outputMin; // Minimum output value
-    std::mutex m_outputMinMutex; // Mutex for outputMin to ensure thread safety
+    mutable std::mutex m_outputMinMutex; // Mutex for outputMin to ensure thread safety
     SensorData m_outputMax; // Maximum output value
-    std::mutex m_outputMaxMutex; // Mutex for outputMax to ensure thread safety
+    mutable std::mutex m_outputMaxMutex; // Mutex for outputMax to ensure thread safety
 
     std::thread m_regulationThread; // Regulation thread
     std::map<std::string, bool> m_initializationList; // Initialization list for the regulator
