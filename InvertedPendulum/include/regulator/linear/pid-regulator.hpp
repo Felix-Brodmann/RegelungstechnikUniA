@@ -34,7 +34,11 @@ private:
     SensorData m_setpoint; // Setpoint value
     mutable std::mutex m_setpointMutex; // Mutex for setpoint to ensure thread safety
     double m_setpointRampingFixrate = 0.0; // Setpoint ramping fix rate
-    mutable std::mutex m_setpointRampingFixrateMutex; // Mutex for setpoint
+    mutable std::mutex m_setpointRampingFixrateMutex; // Mutex for setpointRampingFixrate to ensure thread safety
+    double m_setpointRampingMin = 0.0; // Minimum value for the ramped setpoint
+    mutable std::mutex m_setpointRampingMinMutex; // Mutex for setpointRampingMin to ensure thread safety
+    double m_setpointRampingMax = 0.0; // Maximum value for the ramped setpoint
+    mutable std::mutex m_setpointRampingMaxMutex; // Mutex for setpointRampingMax to ensure thread safety
     SensorData m_outputMin; // Minimum output value
     mutable std::mutex m_outputMinMutex; // Mutex for outputMin to ensure thread safety
     SensorData m_outputMax; // Maximum output value
@@ -225,6 +229,9 @@ private:
                             // Decrease the ramped setpoint
                             setRampedSetpoint(std::get<T>(getRampedSetpoint()) - getSetpointRampingFixrate() * dt);
                         }
+                        setRampedSetpoint(std::clamp<T>(std::get<T>(getRampedSetpoint()), 
+                                                        getSetpointRampingMin(),
+                                                        getSetpointRampingMax()));
                     }
 
                     // Calculate the error
@@ -468,6 +475,41 @@ public:
         std::scoped_lock lock(m_setpointRampingFixrateMutex);
         setInitializationStatus("setpointRampingFixrate", true);
         m_setpointRampingFixrate = t_setpointRampingFixrate;
+    }
+
+    double getSetpointRampingMin()
+    {
+        std::scoped_lock lock(m_setpointRampingMinMutex);
+        if (!isInitialized("setpointRampingMin"))
+        {
+            throw std::runtime_error("Setpoint ramping minimum is not initialized");
+        }
+        return m_setpointRampingMin;
+    }
+
+    double getSetpointRampingMax()
+    {
+        std::scoped_lock lock(m_setpointRampingMaxMutex);
+        if (!isInitialized("setpointRampingMax"))
+        {
+            throw std::runtime_error("Setpoint ramping maximum is not initialized");
+        }
+        return m_setpointRampingMax;
+    }
+
+    void setSetpointRampingLimits(double t_setpointRampingMin, double t_setpointRampingMax)
+    {
+        std::scoped_lock lock(m_setpointRampingMinMutex, m_setpointRampingMaxMutex);
+        // Check if the limits are valid
+        if (t_setpointRampingMin >= t_setpointRampingMax)
+        {
+            throw std::invalid_argument("Setpoint ramping minimum cannot be greater than or equal to maximum");
+        }
+
+        setInitializationStatus("setpointRampingMin", true);
+        setInitializationStatus("setpointRampingMax", true);
+        m_setpointRampingMin = t_setpointRampingMin;
+        m_setpointRampingMax = t_setpointRampingMax;
     }
 
     /**
