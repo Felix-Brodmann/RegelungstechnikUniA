@@ -232,6 +232,7 @@ private:
                         setRampedSetpoint(std::clamp<T>(std::get<T>(getRampedSetpoint()), 
                                                         getSetpointRampingMin(),
                                                         getSetpointRampingMax()));
+                        getOutputStream().write(getRegulatorName(), "Ramped setpoint: " + toString(std::get<T>(getRampedSetpoint())));
                     }
 
                     // Calculate the error
