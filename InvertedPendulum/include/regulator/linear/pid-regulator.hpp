@@ -501,10 +501,33 @@ public:
     void setSetpointRampingLimits(SensorData t_setpointRampingMin, SensorData t_setpointRampingMax)
     {
         std::scoped_lock lock(m_setpointRampingMinMutex, m_setpointRampingMaxMutex);
-        // Check if the limits are valid
-        if (t_setpointRampingMin > t_setpointRampingMax)
+        // Check if the limits are of the same type
+        if (t_setpointRampingMin.index() != t_setpointRampingMax.index())
         {
-            throw std::invalid_argument("Setpoint ramping minimum cannot be greater than or equal to maximum");
+            throw std::invalid_argument("Setpoint ramping limits must be of the same type");
+        }
+
+        // Check if the limits are invalid
+        if (!std::visit([](const auto& minVal, const auto& maxVal) -> bool {
+            using T = std::decay_t<decltype(minVal)>;
+            using U = std::decay_t<decltype(maxVal)>;
+
+            // Check if the types are the same
+            if constexpr (!std::is_same_v<T, U>)
+            {
+                return false; // Types must be the same
+            }
+            else if constexpr ( std::is_same_v<T, int> || std::is_same_v<T, double> || std::is_same_v<T, Vector2D> || std::is_same_v<T, Vector3D>)
+            {
+                return minVal < maxVal;
+            }
+            else
+            {
+                return false;
+            }
+        }, t_setpointRampingMin, t_setpointRampingMax))
+        {            
+            throw std::invalid_argument("Setpoint ramping minimum cannot be greater than setpoint ramping maximum and must be of a supported type");
         }
 
         setInitializationStatus("setpointRampingMin", true);
