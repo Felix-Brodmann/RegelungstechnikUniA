@@ -109,7 +109,8 @@ int main()
             .build();
 
         pidRegulator->setSetpointRampingFixrate(1.0); // Setpoint ramping fix rate
-        pidRegulator->setSetpointRampingLimits(-2.0, 2.0); // Setpoint ramping limits
+        pidRegulator->setSetpointRampingLimits( control_engineering_uni_a::SensorData(-2.0), 
+                                                control_engineering_uni_a::SensorData(2.0)); // Setpoint ramping limits
         pidRegulator->setSamplingRate(100); // Set the sampling rate to 100 Hz
         pidRegulator->setOutputStream(outputStream); // Set the output stream for logging
 
