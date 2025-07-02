@@ -176,7 +176,7 @@ private:
             SensorData measurement = getSensor().getSensorData();
 
             // Check if the measurement is of the same type as the setpoint
-            if (measurement.index() != getSetpoint().index())
+            if (measurement.index() != m_setpoint.index())
             {
                 throw std::runtime_error("Measurement type does not match setpoint type");
             }
@@ -203,7 +203,9 @@ private:
                         setIntegral(T{0});
                         setLastTime(now);
                         setFirstRun(false);
-                        return error * getKp();
+                        return std::clamp<T>(std::get<T>(getRampedSetpoint()) - val, 
+                                             std::get<T>(getOutputMin()), 
+                                             std::get<T>(getOutputMax()));
                     }
 
                     // Calculate the time difference since the last measurement
@@ -223,6 +225,7 @@ private:
                             // Decrease the ramped setpoint
                             setRampedSetpoint(std::get<T>(getRampedSetpoint()) - getSetpointRampingFixrate() * dt);
                         }
+                    }
 
                     // Calculate the error
                     auto error = std::get<T>(getRampedSetpoint()) - val;

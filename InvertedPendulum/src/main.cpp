@@ -108,6 +108,7 @@ int main()
             .setIntegralMax(control_engineering_uni_a::SensorData(4.0)) // Maximum integral error
             .build();
 
+        pidRegulator->setSetpointRampingFixrate(0.5); // Setpoint ramping fix rate
         pidRegulator->setSamplingRate(100); // Set the sampling rate to 100 Hz
         pidRegulator->setOutputStream(outputStream); // Set the output stream for logging
 
