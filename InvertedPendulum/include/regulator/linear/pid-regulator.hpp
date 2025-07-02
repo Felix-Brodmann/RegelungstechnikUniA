@@ -502,7 +502,7 @@ public:
     {
         std::scoped_lock lock(m_setpointRampingMinMutex, m_setpointRampingMaxMutex);
         // Check if the limits are valid
-        if (t_setpointRampingMin >= t_setpointRampingMax)
+        if (t_setpointRampingMin > t_setpointRampingMax)
         {
             throw std::invalid_argument("Setpoint ramping minimum cannot be greater than or equal to maximum");
         }
