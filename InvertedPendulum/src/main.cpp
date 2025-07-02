@@ -53,6 +53,8 @@ int main()
         std::unique_ptr<control_engineering_uni_a::ComplementaryFilter> imuFilter =
             std::make_unique<control_engineering_uni_a::ComplementaryFilter>(0.98);
 
+        imuFilter->getOutputStream(outputStream); // Set the output stream for the filter
+
         imuSensor->addFilter(std::move(imuFilter)); // Add the filter to the IMU sensor
         imuSensor->setOutputStream(outputStream); // Set the output stream for the sensor
 
@@ -96,14 +98,14 @@ int main()
             .setName("Lego Inverted Pendulum PID Regulator")
             .setSensor(std::move(imuSensor))
             .setActuator(std::move(motor))
-            .setKp(30.0) // Proportional gain
-            .setKi(20.0) // Integral gain
-            .setKd(1.0) // Derivative gain
+            .setKp(38.0) // Proportional gain
+            .setKi(0.0) // Integral gain
+            .setKd(0.9) // Derivative gain
             .setSetpoint(control_engineering_uni_a::SensorData(0.0)) // Setpoint value
             .setOutputMin(control_engineering_uni_a::SensorData(-100.0)) // Minimum output value
             .setOutputMax(control_engineering_uni_a::SensorData(100.0)) // Maximum output value
-            .setIntegralMin(control_engineering_uni_a::SensorData(-50.0)) // Minimum integral error
-            .setIntegralMax(control_engineering_uni_a::SensorData(50.0)) // Maximum integral error
+            .setIntegralMin(control_engineering_uni_a::SensorData(-4.0)) // Minimum integral error
+            .setIntegralMax(control_engineering_uni_a::SensorData(4.0)) // Maximum integral error
             .build();
 
         pidRegulator->setSamplingRate(100); // Set the sampling rate to 100 Hz

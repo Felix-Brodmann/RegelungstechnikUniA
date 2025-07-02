@@ -35,9 +35,19 @@ struct Vector2D
         return Vector2D{x + other.x, y + other.y};
     }
 
+    Vector2D operator+(const double scalar) const
+    {
+        return Vector2D{x + scalar, y + scalar};
+    }
+
     Vector2D operator-(const Vector2D& other) const
     {
         return Vector2D{x - other.x, y - other.y};
+    }
+
+    Vector2D operator-(const double scalar) const
+    {
+        return Vector2D{x - scalar, y - scalar};
     }
 
     Vector2D operator*(double scalar) const
@@ -131,9 +141,19 @@ struct Vector3D
         return Vector3D{x + other.x, y + other.y, z + other.z};
     }
 
+    Vector3D operator+(const double scalar) const
+    {
+        return Vector3D{x + scalar, y + scalar, z + scalar};
+    }
+
     Vector3D operator-(const Vector3D& other) const
     {
         return Vector3D{x - other.x, y - other.y, z - other.z};
+    }
+
+    Vector3D operator-(const double scalar) const
+    {
+        return Vector3D{x - scalar, y - scalar, z - scalar};
     }
 
     Vector3D operator*(double scalar) const

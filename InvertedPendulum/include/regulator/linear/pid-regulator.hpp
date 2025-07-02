@@ -33,6 +33,8 @@ private:
     mutable std::mutex m_kdMutex; // Mutex for Kd to ensure thread safety
     SensorData m_setpoint; // Setpoint value
     mutable std::mutex m_setpointMutex; // Mutex for setpoint to ensure thread safety
+    double m_setpointRampingFixrate = 0.0; // Setpoint ramping fix rate
+    mutable std::mutex m_setpointRampingFixrateMutex; // Mutex for setpoint
     SensorData m_outputMin; // Minimum output value
     mutable std::mutex m_outputMinMutex; // Mutex for outputMin to ensure thread safety
     SensorData m_outputMax; // Maximum output value
@@ -43,6 +45,7 @@ private:
     mutable std::mutex m_integralMaxMutex; // Mutex for integralMax to ensure thread safety
 
     SensorData m_lastError; // Last error value
+    SensorData m_rampedSetpoint; // Ramped setpoint value
     SensorData m_integral; // Integral value
     std::chrono::steady_clock::time_point m_lastTime; // Last time the sensor was read
     bool m_firstRun = true; // Flag to check if it's the first run (for the derivative calculation)
@@ -60,6 +63,18 @@ private:
      * @param t_lastError The last error value to be set.
      */
     void setLastError(SensorData t_lastError) { m_lastError = t_lastError; }
+
+    /**
+     * @brief Get the ramped setpoint value.
+     * @return The ramped setpoint value.
+     */
+    SensorData getRampedSetpoint() const { return m_rampedSetpoint; }
+
+    /**
+     * @brief Set the ramped setpoint value.
+     * @param t_rampedSetpoint The ramped setpoint value to be set.
+     */
+    void setRampedSetpoint(SensorData t_rampedSetpoint) { m_rampedSetpoint = t_rampedSetpoint; }
 
     /**
      * @brief Get the integral value.
@@ -161,7 +176,7 @@ private:
             SensorData measurement = getSensor().getSensorData();
 
             // Check if the measurement is of the same type as the setpoint
-            if (measurement.index() != m_setpoint.index())
+            if (measurement.index() != getSetpoint().index())
             {
                 throw std::runtime_error("Measurement type does not match setpoint type");
             }
@@ -176,10 +191,6 @@ private:
                 // Check if the type is supported
                 if constexpr (std::is_same_v<T, int> || std::is_same_v<T, double> || std::is_same_v<T, Vector2D> || std::is_same_v<T, Vector3D>)
                 {
-                    // Calculate the error
-                    auto error = std::get<T>(getSetpoint()) - val;
-                    getOutputStream().write(getRegulatorName(), "Calculated error: " + toString(error));
-
                     // Get the current time
                     auto now = std::chrono::steady_clock::now();
 
@@ -187,7 +198,8 @@ private:
                     if (isFirstRun())
                     {
                         // Initialize the last error and time and set the integral to zero
-                        setLastError(error);
+                        setLastError(std::get<T>(getSetpoint()) - val);
+                        setRampedSetpoint(getSetpoint());
                         setIntegral(T{0});
                         setLastTime(now);
                         setFirstRun(false);
@@ -197,6 +209,24 @@ private:
                     // Calculate the time difference since the last measurement
                     double dt = std::chrono::duration<double>(now - getLastTime()).count();
                     if (dt < 1e-6) dt = 1e-6; // at least 1 µs for protection
+
+                    // If setpoint ramping is enabled, apply the ramping fix rate
+                    if (getSetpointRampingFixrate() > 0.0)
+                    {
+                        if (val < getRampedSetpoint())
+                        {
+                            // Increase the ramped setpoint
+                            setRampedSetpoint(std::get<T>(getRampedSetpoint()) + getSetpointRampingFixrate() * dt);
+                        }
+                        else if (val > getRampedSetpoint())
+                        {
+                            // Decrease the ramped setpoint
+                            setRampedSetpoint(std::get<T>(getRampedSetpoint()) - getSetpointRampingFixrate() * dt);
+                        }
+
+                    // Calculate the error
+                    auto error = std::get<T>(getRampedSetpoint()) - val;
+                    getOutputStream().write(getRegulatorName(), "Calculated error: " + toString(error));
 
                     // Calculate the integral error
                     auto integralError = std::get<T>(getIntegral()) + error * dt;
@@ -418,6 +448,23 @@ public:
 
         setInitializationStatus("setpoint", true);
         m_setpoint = t_setpoint;
+    }
+
+    double getSetpointRampingFixrate()
+    {
+        std::scoped_lock lock(m_setpointRampingFixrateMutex);
+        if (!isInitialized("setpointRampingFixrate"))
+        {
+            throw std::runtime_error("Setpoint ramping fix rate is not initialized");
+        }
+        return m_setpointRampingFixrate;
+    }
+
+    void setSetpointRampingFixrate(double t_setpointRampingFixrate)
+    {
+        std::scoped_lock lock(m_setpointRampingFixrateMutex);
+        setInitializationStatus("setpointRampingFixrate", true);
+        m_setpointRampingFixrate = t_setpointRampingFixrate;
     }
 
     /**

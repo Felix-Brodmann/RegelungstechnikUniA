@@ -65,8 +65,8 @@ public:
             double dt = elapsedTime.count();
             m_lastTime = currentTime;
 
-            double gyroAngleZ = latestAngle + gyroscopeZ * dt;
-            double accelAngleZ = std::atan(accelerometerY /accelerometerX) * 180 / M_PI;
+            double gyroAngleZ = latestAngle - gyroscopeZ * dt;
+            double accelAngleZ = std::atan(accelerometerY / accelerometerX) * 180 / M_PI;
             double newAngle = m_alpha * gyroAngleZ + (1 - m_alpha) * accelAngleZ;
             setFilteredData(newAngle);
             setFilteredDataWithTimestamp({newAngle, std::chrono::system_clock::now()});
