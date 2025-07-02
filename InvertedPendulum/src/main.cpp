@@ -53,7 +53,7 @@ int main()
         std::unique_ptr<control_engineering_uni_a::ComplementaryFilter> imuFilter =
             std::make_unique<control_engineering_uni_a::ComplementaryFilter>(0.98);
 
-        imuFilter->getOutputStream(outputStream); // Set the output stream for the filter
+        imuFilter->setOutputStream(outputStream); // Set the output stream for the filter
 
         imuSensor->addFilter(std::move(imuFilter)); // Add the filter to the IMU sensor
         imuSensor->setOutputStream(outputStream); // Set the output stream for the sensor

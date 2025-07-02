@@ -215,12 +215,12 @@ private:
                     // If setpoint ramping is enabled, apply the ramping fix rate
                     if (getSetpointRampingFixrate() > 0.0)
                     {
-                        if (val < getRampedSetpoint())
+                        if (val < std::get<T>(getRampedSetpoint()))
                         {
                             // Increase the ramped setpoint
                             setRampedSetpoint(std::get<T>(getRampedSetpoint()) + getSetpointRampingFixrate() * dt);
                         }
-                        else if (val > getRampedSetpoint())
+                        else if (val > std::get<T>(getRampedSetpoint()))
                         {
                             // Decrease the ramped setpoint
                             setRampedSetpoint(std::get<T>(getRampedSetpoint()) - getSetpointRampingFixrate() * dt);
